@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Results | Quantum Lung Cancer Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Analysis Results</h1>
+            <a href="{{ url_for('index') }}" class="back-btn">Upload Another Image</a>
+        </header>
+        
+        <main class="results-main">
+            <div class="results-container">
+                <div class="image-container">
+                    <h2>Analyzed Image</h2>
+                    <img src="data:image/jpeg;base64,{{ image_data }}" alt="Analyzed CT Scan" class="result-image">
+                </div>
+                
+                <div class="prediction-container">
+                    <h2>Prediction Results</h2>
+                    <div class="primary-prediction">
+                        <h3>Detected Cancer Type:</h3>
+                        <p class="prediction">{{ predicted_class }}</p>
+                        <p class="confidence">Confidence: {{ "%.2f"|format(confidence) }}%</p>
+                    </div>
+                    
+                    <div class="all-predictions">
+                        <h3>Top Predictions:</h3>
+                        <div class="prediction-bars">
+                            {% for class_name, prob in top_predictions %}
+                            <div class="prediction-bar">
+                                <div class="bar-label">{{ class_name }}</div>
+                                <div class="bar-container">
+                                    <div class="bar" style="width: {{ prob * 100 }}%"></div>
+                                </div>
+                                <div class="bar-value">{{ "%.2f"|format(prob * 100) }}%</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="disclaimer">
+                <p><strong>Important Notice:</strong> This is a research tool and should not be used as a substitute for professional medical diagnosis. Always consult with healthcare professionals for proper diagnosis and treatment.</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Quantum Lung Cancer Detection Project</p>
+        </footer>
+    </div>
+</body>
+</html>

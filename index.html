@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Lung Cancer Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quantum-Inspired Lung Cancer Detection</h1>
+            <p>Upload a CT scan image for analysis using our quantum hybrid model</p>
+        </header>
+        
+        <main>
+            <div class="upload-container">
+                <h2>Upload CT Scan Image</h2>
+                
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert">
+                      {% for message in messages %}
+                        <p>{{ message }}</p>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                
+                <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="upload-form">
+                    <div class="file-input">
+                        <input type="file" name="file" id="file" accept="image/*" required>
+                        <label for="file">Choose a file</label>
+                    </div>
+                    
+                    <div id="preview-container" class="hidden">
+                        <h3>Image Preview</h3>
+                        <img id="image-preview" src="#" alt="Preview">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Analyze Image</button>
+                </form>
+            </div>
+            
+            <div class="info-container">
+                <h2>About Our Technology</h2>
+                <p>This application uses a quantum-inspired hybrid model combining ResNet50 and quantum neural networks for lung cancer type classification from CT scans.</p>
+                <p>The model can detect several types of lung cancer with high accuracy, providing valuable diagnostic insights.</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Quantum Lung Cancer Detection Project</p>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
