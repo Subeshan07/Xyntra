@@ -24,7 +24,7 @@
                     <h2>Prediction Results</h2>
                     <div class="primary-prediction">
                         <h3>Detected Cancer Type:</h3>
-                        <p class="prediction">{{ predicted_class }}</p>
+                        <p class="prediction cancer-type-name" title="{{ predicted_class }}">{{ predicted_class }}</p>
                         <p class="confidence">Confidence: {{ "%.2f"|format(confidence) }}%</p>
                     </div>
                     
@@ -33,7 +33,7 @@
                         <div class="prediction-bars">
                             {% for class_name, prob in top_predictions %}
                             <div class="prediction-bar">
-                                <div class="bar-label">{{ class_name }}</div>
+                                <div class="bar-label" title="{{ class_name }}">{{ class_name }}</div>
                                 <div class="bar-container">
                                     <div class="bar" style="width: {{ prob * 100 }}%"></div>
                                 </div>
@@ -45,6 +45,124 @@
                 </div>
             </div>
             
+            <div class="medical-details">
+                <h2>Medical Analysis</h2>
+                <div class="detail-section">
+                    <div class="characteristics">
+                        <h3>Characteristics</h3>
+                        <ul id="cancerCharacteristics">
+                            <li>Loading cancer characteristics...</li>
+                        </ul>
+                    </div>
+                    <div class="treatment-options">
+                        <h3>Potential Treatment Options</h3>
+                        <ul id="treatmentOptions">
+                            <li>Loading treatment options...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quantum-insights">
+                <h2>Quantum Analysis Insights</h2>
+                <div class="quantum-confidence-meter">
+                    <div class="quantum-confidence-label">Quantum Model Confidence</div>
+                    <div class="quantum-meter-container">
+                        <div class="quantum-meter" style="width: {{ confidence }}%"></div>
+                    </div>
+                    <div class="quantum-metrics">
+                        <div class="quantum-metric">
+                            <span class="metric-name">Feature Importance:</span>
+                            <span class="metric-value">High</span>
+                        </div>
+                        <div class="quantum-metric">
+                            <span class="metric-name">Model Certainty:</span>
+                            <span class="metric-value">{{ "%.2f"|format(confidence) }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add this section to your results.html file before the disclaimer div -->
+<div class="doctor-consultation">
+    <h2>Consult with a Specialist</h2>
+    <div class="consultation-intro">
+        <p>Based on your scan results, we recommend consulting with a specialist for proper diagnosis and treatment options.</p>
+        <p>Book a virtual consultation with one of our qualified oncologists to discuss your results in detail.</p>
+    </div>
+    
+    <div class="consultation-options">
+        <div class="doctor-profiles">
+            <h3>Available Specialists</h3>
+            <div class="doctor-list" id="doctorList">
+                <!-- Doctor profiles will be loaded here -->
+                <div class="loading-spinner doctor-loading"></div>
+            </div>
+        </div>
+        
+        <div class="appointment-booking">
+            <h3>Book Appointment</h3>
+            <div class="selected-doctor-info" id="selectedDoctorInfo">
+                <p>Please select a doctor from the list to view available time slots.</p>
+            </div>
+            
+            <div class="date-selection" id="dateSelection" style="display: none;">
+                <h4>Select Date</h4>
+                <div class="date-picker">
+                    <div class="calendar-control">
+                        <button id="prevWeek" class="calendar-nav-btn">&lt;</button>
+                        <span id="currentMonth">April 2025</span>
+                        <button id="nextWeek" class="calendar-nav-btn">&gt;</button>
+                    </div>
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- Calendar days will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="time-selection" id="timeSelection" style="display: none;">
+                <h4>Select Time</h4>
+                <div class="time-slots" id="timeSlots">
+                    <!-- Time slots will be generated here -->
+                </div>
+            </div>
+            
+            <div class="booking-form" id="bookingForm" style="display: none;">
+                <h4>Your Information</h4>
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label for="patientName">Full Name</label>
+                        <input type="text" id="patientName" name="patientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientEmail">Email</label>
+                        <input type="email" id="patientEmail" name="patientEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientPhone">Phone</label>
+                        <input type="tel" id="patientPhone" name="patientPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="consultationNotes">Additional Notes (optional)</label>
+                        <textarea id="consultationNotes" name="consultationNotes" rows="3"></textarea>
+                    </div>
+                    <div class="appointment-summary" id="appointmentSummary"></div>
+                    <button type="submit" class="booking-btn">Confirm Appointment</button>
+                </form>
+            </div>
+            
+            <div class="booking-confirmation" id="bookingConfirmation" style="display: none;">
+                <div class="confirmation-content">
+                    <div class="confirmation-icon">✓</div>
+                    <h3>Appointment Confirmed!</h3>
+                    <div id="confirmationDetails"></div>
+                    <p>We've sent the appointment details to your email. You'll receive a link to join the video consultation at your scheduled time.</p>
+                    <button class="close-confirmation-btn" id="closeConfirmation">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             <div class="disclaimer">
                 <p><strong>Important Notice:</strong> This is a research tool and should not be used as a substitute for professional medical diagnosis. Always consult with healthcare professionals for proper diagnosis and treatment.</p>
             </div>
@@ -54,5 +172,408 @@
             <p>&copy; 2025 Quantum Lung Cancer Detection Project</p>
         </footer>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get cancer type from the page
+            const cancerType = document.querySelector('.cancer-type-name').textContent;
+            
+            // Populate cancer characteristics based on detection
+            const characteristicsElement = document.getElementById('cancerCharacteristics');
+            const treatmentElement = document.getElementById('treatmentOptions');
+            
+            // Example of dynamic content based on cancer type
+            if (cancerType.includes('large.cell.carcinoma')) {
+                characteristicsElement.innerHTML = `
+                    <li>Fast-growing, aggressive form of non-small cell lung cancer</li>
+                    <li>Typically forms in the outer regions of the lungs</li>
+                    <li>Often spreads to nearby lymph nodes and distant organs</li>
+                    <li>May cause symptoms like coughing, chest pain, and shortness of breath</li>
+                `;
+                
+                treatmentElement.innerHTML = `
+                    <li>Surgery (for localized tumors)</li>
+                    <li>Radiation therapy</li>
+                    <li>Chemotherapy with platinum-based agents</li>
+                    <li>Immunotherapy for eligible patients</li>
+                    <li>Targeted therapy if specific genetic mutations are present</li>
+                `;
+            } else if (cancerType.includes('squamous.cell.carcinoma')) {
+                // Different content for different cancer types
+                characteristicsElement.innerHTML = `
+                    <li>Forms in the cells lining the bronchial tubes</li>
+                    <li>Often associated with smoking history</li>
+                    <li>May grow more slowly than large cell carcinoma</li>
+                    <li>Can cause symptoms like persistent cough and hemoptysis</li>
+                `;
+                
+                treatmentElement.innerHTML = `
+                    <li>Surgical resection when possible</li>
+                    <li>Radiation therapy</li>
+                    <li>Chemotherapy</li>
+                    <li>Immunotherapy with checkpoint inhibitors</li>
+                    <li>Clinical trials evaluating new treatment approaches</li>
+                `;
+            } else {
+                // Generic content for other types
+                characteristicsElement.innerHTML = `
+                    <li>Specific characteristics depend on cancer subtype and stage</li>
+                    <li>Growth pattern and location determine symptoms and treatment</li>
+                    <li>Staging (T, N, M) indicates extent of disease</li>
+                `;
+                
+                treatmentElement.innerHTML = `
+                    <li>Treatment plan should be determined by oncology team</li>
+                    <li>Options may include surgery, radiation, chemotherapy</li>
+                    <li>Targeted therapy based on molecular testing</li>
+                    <li>Immunotherapy may be considered</li>
+                `;
+            }
+        });
+        
+
+        // Add this to the bottom of the existing script.js file or to the inline script in results.html
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Doctor list population for results page
+    const doctorList = document.getElementById('doctorList');
+    
+    if (doctorList) {
+        // Remove loading spinner
+        doctorList.innerHTML = '';
+        
+        // Sample doctor data - in a real app, this would come from a database
+        const doctors = [
+            {
+                id: 'dr-chen',
+                name: 'Dr. Sarah Chen',
+                specialty: 'Thoracic Oncology',
+                experience: '15 years experience',
+                image: 'static//Dr. Sarah Chen.jpeg',
+                availability: 'Available today'
+            },
+            {
+                id: 'dr-patel',
+                name: 'Dr. Raj Patel',
+                specialty: 'Pulmonary Oncology',
+                experience: '12 years experience',
+                image: 'static//Dr. Raj Patel.jpg',
+                availability: 'Available tomorrow'
+            },
+            {
+                id: 'dr-williams',
+                name: 'Dr. Michael Williams',
+                specialty: 'Radiation Oncology',
+                experience: '20 years experience',
+                image: 'static//Dr. Michael Williams.jpg',
+                availability: 'Available Friday'
+            }
+        ];
+        
+        // Create doctor cards and add to the list
+        doctors.forEach(doctor => {
+            const doctorCard = document.createElement('div');
+            doctorCard.classList.add('doctor-card');
+            doctorCard.setAttribute('data-doctor-id', doctor.id);
+            
+            doctorCard.innerHTML = `
+    <div class="doctor-image">
+        <img src="${doctor.image}" alt="${doctor.name}" width="80" height="80">
+    </div>
+    <div class="doctor-info">
+        <h4>${doctor.name}</h4>
+        <p class="doctor-specialty">${doctor.specialty}</p>
+        <p class="doctor-experience">${doctor.experience}</p>
+        <span class="doctor-availability">${doctor.availability}</span>
+    </div>
+`;
+            
+            // Add click event to select this doctor
+            doctorCard.addEventListener('click', function() {
+                // Remove selected class from all doctor cards
+                document.querySelectorAll('.doctor-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Add selected class to this doctor card
+                doctorCard.classList.add('selected');
+                
+                // Update selected doctor info
+                const selectedDoctorInfo = document.getElementById('selectedDoctorInfo');
+                if (selectedDoctorInfo) {
+                    selectedDoctorInfo.innerHTML = `
+    <div class="selected-doctor">
+        <div class="doctor-image">
+            <img src="${doctor.image}" alt="${doctor.name}" width="100" height="100">
+        </div>
+        <div class="doctor-details">
+            <h4>${doctor.name}</h4>
+            <p>${doctor.specialty}</p>
+            <p>${doctor.experience}</p>
+        </div>
+    </div>
+    <p>Please select a date and time for your virtual consultation.</p>
+`;
+                }
+                
+                // Show date selection
+                const dateSelection = document.getElementById('dateSelection');
+                if (dateSelection) {
+                    dateSelection.style.display = 'block';
+                }
+                
+                // Initialize calendar if needed
+                initializeCalendar();
+            });
+            
+            doctorList.appendChild(doctorCard);
+        });
+        
+        // Auto-select first doctor if available
+        if (doctors.length > 0) {
+            const firstDoctorCard = doctorList.querySelector('.doctor-card');
+            if (firstDoctorCard) {
+                setTimeout(() => {
+                    firstDoctorCard.click();
+                }, 500);
+            }
+        }
+    }
+    
+    // Initialize calendar for appointment booking
+    function initializeCalendar() {
+        const calendarDays = document.getElementById('calendarDays');
+        const currentMonthElement = document.getElementById('currentMonth');
+        const prevWeekButton = document.getElementById('prevWeek');
+        const nextWeekButton = document.getElementById('nextWeek');
+        
+        if (!calendarDays || !currentMonthElement) return;
+        
+        // Current date for calendar
+        let currentDate = new Date();
+        let selectedDate = null;
+        
+        // Render calendar days
+        function renderCalendarDays() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            // Set current month display
+            currentMonthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            // Clear existing calendar days
+            calendarDays.innerHTML = '';
+            
+            // Get start of week (Sunday)
+            const startDate = new Date(currentDate);
+            startDate.setDate(currentDate.getDate() - currentDate.getDay());
+            
+            // Generate 7 days (a week)
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day');
+                
+                // Check if day is in the past
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (date < today) {
+                    dayElement.classList.add('disabled');
+                } else {
+                    dayElement.classList.add('selectable');
+                    
+                    // Add click handler
+                    dayElement.addEventListener('click', function() {
+                        // Remove selected class from all days
+                        document.querySelectorAll('.calendar-day').forEach(day => {
+                            day.classList.remove('selected');
+                        });
+                        
+                        // Add selected class to this day
+                        dayElement.classList.add('selected');
+                        
+                        // Set selected date
+                        selectedDate = new Date(date);
+                        
+                        // Show time selection
+                        const timeSelection = document.getElementById('timeSelection');
+                        if (timeSelection) {
+                            timeSelection.style.display = 'block';
+                        }
+                        
+                        // Generate time slots
+                        generateTimeSlots();
+                    });
+                }
+                
+                // Check if this day is selected
+                if (selectedDate && date.getDate() === selectedDate.getDate() && 
+                    date.getMonth() === selectedDate.getMonth() && 
+                    date.getFullYear() === selectedDate.getFullYear()) {
+                    dayElement.classList.add('selected');
+                }
+                
+                // Day content
+                const dayNumber = document.createElement('div');
+                dayNumber.classList.add('day-number');
+                dayNumber.textContent = date.getDate();
+                
+                const dayName = document.createElement('div');
+                dayName.classList.add('day-name');
+                dayName.textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
+                
+                dayElement.appendChild(dayNumber);
+                dayElement.appendChild(dayName);
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
+        // Generate time slots
+        function generateTimeSlots() {
+            const timeSlots = document.getElementById('timeSlots');
+            if (!timeSlots) return;
+            
+            // Clear existing time slots
+            timeSlots.innerHTML = '';
+            
+            // Generate time slots from 9 AM to 4 PM
+            const slots = [
+                '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', 
+                '11:00 AM', '11:30 AM', '1:00 PM', '1:30 PM',
+                '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM'
+            ];
+            
+            // Generate some unavailable slots randomly
+            const unavailableIndexes = [];
+            for (let i = 0; i < 3; i++) {
+                const randomIndex = Math.floor(Math.random() * slots.length);
+                unavailableIndexes.push(randomIndex);
+            }
+            
+            slots.forEach((slot, index) => {
+                const timeSlot = document.createElement('div');
+                timeSlot.classList.add('time-slot');
+                
+                if (unavailableIndexes.includes(index)) {
+                    timeSlot.classList.add('unavailable');
+                    timeSlot.textContent = slot + ' (Unavailable)';
+                } else {
+                    timeSlot.textContent = slot;
+                    
+                    // Add click handler
+                    timeSlot.addEventListener('click', function() {
+                        // Remove selected class from all time slots
+                        document.querySelectorAll('.time-slot').forEach(ts => {
+                            ts.classList.remove('selected');
+                        });
+                        
+                        // Add selected class to this time slot
+                        timeSlot.classList.add('selected');
+                        
+                        // Show booking form
+                        const bookingForm = document.getElementById('bookingForm');
+                        if (bookingForm) {
+                            bookingForm.style.display = 'block';
+                        }
+                        
+                        // Update appointment summary
+                        updateAppointmentSummary(slot);
+                    });
+                }
+                
+                timeSlots.appendChild(timeSlot);
+            });
+        }
+        
+        // Update appointment summary
+        function updateAppointmentSummary(selectedTime) {
+            const appointmentSummary = document.getElementById('appointmentSummary');
+            if (!appointmentSummary || !selectedDate || !selectedTime) return;
+            
+            const selectedDoctor = document.querySelector('.doctor-card.selected');
+            if (!selectedDoctor) return;
+            
+            const doctorName = selectedDoctor.querySelector('h4').textContent;
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = selectedDate.toLocaleDateString('en-US', options);
+            
+            appointmentSummary.innerHTML = `
+                <h4>Appointment Summary</h4>
+                <p><strong>Doctor:</strong> ${doctorName}</p>
+                <p><strong>Date:</strong> ${formattedDate}</p>
+                <p><strong>Time:</strong> ${selectedTime}</p>
+            `;
+        }
+        
+        // Set up navigation buttons
+        if (prevWeekButton) {
+            prevWeekButton.addEventListener('click', function() {
+                currentDate.setDate(currentDate.getDate() - 7);
+                renderCalendarDays();
+            });
+        }
+        
+        if (nextWeekButton) {
+            nextWeekButton.addEventListener('click', function() {
+                currentDate.setDate(currentDate.getDate() + 7);
+                renderCalendarDays();
+            });
+        }
+        
+        // Set up form submission
+        const appointmentForm = document.getElementById('appointmentForm');
+        if (appointmentForm) {
+            appointmentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show confirmation
+                const bookingConfirmation = document.getElementById('bookingConfirmation');
+                const confirmationDetails = document.getElementById('confirmationDetails');
+                
+                if (bookingConfirmation && confirmationDetails) {
+                    const selectedDoctor = document.querySelector('.doctor-card.selected');
+                    const doctorName = selectedDoctor ? selectedDoctor.querySelector('h4').textContent : '';
+                    
+                    const patientName = document.getElementById('patientName').value;
+                    
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    const formattedDate = selectedDate.toLocaleDateString('en-US', options);
+                    
+                    const selectedTimeElement = document.querySelector('.time-slot.selected');
+                    const selectedTime = selectedTimeElement ? selectedTimeElement.textContent : '';
+                    
+                    confirmationDetails.innerHTML = `
+                        <p><strong>Doctor:</strong> ${doctorName}</p>
+                        <p><strong>Patient:</strong> ${patientName}</p>
+                        <p><strong>Date:</strong> ${formattedDate}</p>
+                        <p><strong>Time:</strong> ${selectedTime}</p>
+                    `;
+                    
+                    bookingForm.style.display = 'none';
+                    bookingConfirmation.style.display = 'block';
+                }
+            });
+        }
+        
+        // Close confirmation button
+        const closeConfirmation = document.getElementById('closeConfirmation');
+        if (closeConfirmation) {
+            closeConfirmation.addEventListener('click', function() {
+                const bookingConfirmation = document.getElementById('bookingConfirmation');
+                if (bookingConfirmation) {
+                    bookingConfirmation.style.display = 'none';
+                }
+            });
+        }
+        
+        // Initial render
+        renderCalendarDays();
+    }
+});
+    </script>
 </body>
 </html>
